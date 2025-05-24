@@ -66,6 +66,9 @@ yarn-error.log
 # testing
 /coverage
 
+# Package
+package-lock.json
+
 # Yarn
 .yarn/*
 !.yarn/patches

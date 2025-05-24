@@ -1,30 +1,70 @@
-import UIKit
-import React
-import React_RCTAppDelegate
-import ReactAppDependencyProvider
+import SwiftUI
+import ReactBrownfield
 
 @main
-class AppDelegate: RCTAppDelegate {
-  override func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-    self.moduleName = "AwesomeProject"
-    self.dependencyProvider = RCTAppDependencyProvider()
+struct MyApp: App {
+    init() {
+        ReactNativeBrownfield.shared.startReactNative {
+            print("React Native loaded.")
+        }
+    }
 
-    // You can add your custom initial props in the dictionary below.
-    // They will be passed down to the ViewController used by React Native.
-    self.initialProps = [:]
+    var body: some Scene {
+        WindowGroup {
+            NavigationView {
+                HomeScreen()
+            }
+            .navigationBarHidden(true) // Hide nav bar at root
+        }
+    }
+}
 
-    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
-  }
+struct HomeScreen: View {
+    @State private var showModal = false
 
-  override func sourceURL(for bridge: RCTBridge) -> URL? {
-    self.bundleURL()
-  }
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("React Native Brownfield Example")
+                .font(.title)
+                .multilineTextAlignment(.center)
+                .padding(.top, 40)
 
-  override func bundleURL() -> URL? {
-#if DEBUG
-    RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
-#else
-    Bundle.main.url(forResource: "main", withExtension: "jsbundle")
-#endif
-  }
+            NavigationLink(destination: ReactNativeView(moduleName: "ReactNative")
+                            .navigationBarHidden(true)) {
+                Text("Push React Native Screen")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+            }
+
+            Button(action: {
+                showModal = true
+            }) {
+                Text("Present React Native Modally")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.green)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+            }
+        }
+        .padding(20)
+        .sheet(isPresented: $showModal) {
+            ReactNativeModalView(moduleName: "ReactNative")
+        }
+    }
+}
+
+struct ReactNativeModalView: View {
+    var moduleName: String
+
+    var body: some View {
+        NavigationView {
+            ReactNativeView(moduleName: moduleName)
+                .navigationBarHidden(true)
+                .edgesIgnoringSafeArea(.all)
+        }
+    }
 }
